@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Resume</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase App (core) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- Add Firebase Storage SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <!-- Modal for skill descriptions -->
+    <div id="skill-modal" class="skill-modal">
+        <div class="skill-modal-content">
+            <span class="skill-modal-close" id="skill-modal-close">&times;</span>
+            <h3 id="skill-modal-title"></h3>
+            <p id="skill-modal-desc"></p>
+        </div>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="resume.pdf" download class="download-btn"><i class="fas fa-download"></i> Resume</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <!-- Google Auth Buttons -->
+        <div style="text-align:right; margin-bottom:10px;">
+            <button id="login-btn" style="background:none; border:none; color:#888; font-size:1em; cursor:pointer; text-decoration:underline; padding:0;">Admin Access</button>
+            <button id="logout-btn" style="display:none; background:none; border:none; color:#888; font-size:1em; cursor:pointer; text-decoration:underline; padding:0;">Sign out</button>
+        </div>
+        <header>
+            <div class="photo-overlay-container">
+                <svg class="profile-ring" width="140" height="140">
+                    <circle class="ring-bg" cx="70" cy="70" r="60" stroke-width="8" fill="none" />
+                    <circle class="ring-progress" id="ring-progress" cx="70" cy="70" r="60" stroke-width="8" fill="none" stroke-dasharray="377" stroke-dashoffset="377" />
+                </svg>
+                <img src="me.jpg" alt="Profile Photo" class="profile-photo">
+                <img src="" alt="Fun Overlay" class="fun-overlay" id="fun-overlay" style="display:none;">
+            </div>
+            <h1 id="editable-name" contenteditable="false" spellcheck="false" style="outline:none;">Your Name</h1>
+            <p class="subtitle" id="editable-tagline" contenteditable="false" spellcheck="false" style="outline:none;">Your Profession or Tagline</p>
+            <div class="social-icons"></div>
+        </header>
+        <section class="about" id="about">
+            <h2>About Me</h2>
+            <p id="editable-about" contenteditable="false" spellcheck="false" style="outline:none;">Brief introduction about yourself. Highlight your background, interests, and what makes you unique.</p>
+        </section>
+        <section class="fun-facts" id="fun-facts" style="display:none;">
+            <h2>🎉 Fun Facts About Me!</h2>
+            <ul>
+                <li>I can solve a Rubik's cube in under a minute.</li>
+                <li>I once backpacked across three countries in two weeks.</li>
+                <li>I love making digital art and animations.</li>
+            </ul>
+        </section>
+        <section class="skills" id="skills">
+            <h2>Technical Skills</h2>
+            <div class="carousel-skills">
+                <div class="carousel-track" id="carousel-track">
+                    <div class="skill-icon" title="HTML5"><i class="fab fa-html5"></i></div>
+                    <div class="skill-icon" title="CSS3"><i class="fab fa-css3-alt"></i></div>
+                    <div class="skill-icon" title="JavaScript"><i class="fab fa-js"></i></div>
+                    <div class="skill-icon" title="PHP"><i class="fab fa-php"></i></div>
+                    <div class="skill-icon" title="Python"><i class="fab fa-python"></i></div>
+                    <div class="skill-icon" title="C#"><span class="skill-label">C#</span></div>
+                    <div class="skill-icon" title="Windows"><i class="fab fa-windows"></i></div>
+                    <div class="skill-icon" title="Linux"><i class="fab fa-linux"></i></div>
+                    <div class="skill-icon" title="AI/Robotics"><i class="fas fa-robot"></i></div>
+                    <div class="skill-icon" title="C"><span class="skill-label">C</span></div>
+                    <div class="skill-icon" title="C++"><span class="skill-label">C++</span></div>
+                </div>
+            </div>
+        </section>
+        <section class="personality" id="personality">
+            <h2>Personality & Soft Skills</h2>
+            <div class="carousel-skills">
+                <div class="carousel-track" id="carousel-track-personality">
+                    <div class="skill-icon" title="Leadership"><i class="fas fa-chess-king"></i></div>
+                    <div class="skill-icon" title="Adaptable"><i class="fas fa-random"></i></div>
+                    <div class="skill-icon" title="Determined"><i class="fas fa-bolt"></i></div>
+                    <div class="skill-icon" title="Open-minded"><i class="fas fa-brain"></i></div>
+                    <div class="skill-icon" title="Team Oriented"><i class="fas fa-users"></i></div>
+                    <div class="skill-icon" title="Curiosity"><i class="fas fa-search"></i></div>
+                    <div class="skill-icon" title="Adventuring"><i class="fas fa-hiking"></i></div>
+                    <div class="skill-icon" title="Self-aware"><i class="fas fa-user-astronaut"></i></div>
+                </div>
+            </div>
+        </section>
+        <section class="experience" id="experience">
+            <h2>Experience</h2>
+            <div id="experience-list">
+                <!-- Experience entries will be rendered here by JS -->
+            </div>
+            <button id="add-experience-btn" style="display:none; padding:6px 16px; font-size:1em; border-radius:8px; background:#ffd700; color:#222; font-weight:bold; border:none; cursor:pointer;">Add Experience</button>
+            <form id="add-experience-form" style="display:none; margin:18px 0 24px 0; background:rgba(0,0,0,0.5); padding:18px; border-radius:10px;">
+                <h3>Add/Edit Experience</h3>
+                <input type="text" id="exp-title" placeholder="Job Title at Company" required style="width:100%;margin-bottom:8px;">
+                <input type="text" id="exp-years" placeholder="Year - Year" required style="width:100%;margin-bottom:8px;">
+                <textarea id="exp-desc" placeholder="Short description of your role and achievements." required style="width:100%;margin-bottom:8px;"></textarea>
+                <button type="submit">Add Experience</button>
+            </form>
+        </section>
+
+        <section class="projects" id="projects">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <h2 style="margin: 0;">Projects</h2>
+        <button id="add-project-btn" style="display:none; padding: 6px 16px; font-size: 1em; border-radius: 8px; background: #ffd700; color: #222; font-weight: bold; border: none; cursor: pointer;">Add Project</button>
+    </div>
+    <form id="add-project-form" style="display:none; margin:18px 0 24px 0; background:rgba(0,0,0,0.5); padding:18px; border-radius:10px;">
+        <h3>Add New Project</h3>
+        <input type="text" id="project-title" placeholder="Project Title" required style="width:100%;margin-bottom:8px;">
+        <textarea id="project-desc" placeholder="Project Description" required style="width:100%;margin-bottom:8px;"></textarea>
+        <input type="url" id="project-link" placeholder="Google Drive Link" required style="width:100%;margin-bottom:8px;">
+        <div id="preview-upload-container" style="display:none;">
+            <label for="project-preview-file" style="margin-top:10px; font-weight:500;">Upload Preview Image/Video</label>
+            <input type="file" id="project-preview-file" accept="image/*,video/*" style="margin-bottom:12px;">
+            <button type="button" id="upload-preview-btn" style="margin-bottom:12px;">Upload Preview</button>
+            <input type="text" id="project-preview-filename" placeholder="Preview filename will appear here" readonly style="margin-bottom:12px;">
+        </div>
+        <button type="submit">Add Project</button>
+    </form>
+    <div class="project-list">
+        <!-- Project cards will be rendered here by JS -->
+    </div>
+</section>
+    <section class="contact" id="contact">
+            <h2>Contact</h2>
+            <p>Email: <a href="mailto:your.email@example.com" id="editable-email" contenteditable="false" spellcheck="false" style="outline:none;">your.email@example.com</a></p>
+            <p id="editable-phone" contenteditable="false" spellcheck="false" style="outline:none;">Phone: +1 234 567 8901</p>
+            <p id="editable-address" contenteditable="false" spellcheck="false" style="outline:none;">Address: 123 Main St, City, Country</p>
+            <div id="editable-social" style="outline:none;">
+                <span>LinkedIn: <a href="https://www.linkedin.com/in/mqtthew-ilustre-23211437b" target="_blank" rel="noopener noreferrer">MATTHEW, ILUSTRE</a></span><br>
+                <span>GitHub: <a href="https://github.com/BoredMZ" target="_blank" rel="noopener noreferrer">BoredMZ</a></span>
+            </div>
+    </section>
+    <section class="references" id="references">
+        <h2>References</h2>
+        <div id="editable-references" contenteditable="false" spellcheck="false" style="outline:none; display: flex; gap: 32px; flex-wrap: wrap;">
+            <div style="flex:1; min-width:220px;">
+                <p><strong>Jane Doe</strong><br>Senior Developer, TechCorp<br>Email: jane.doe@techcorp.com<br>Phone: +1 555 123 4567</p>
+            </div>
+            <div style="flex:1; min-width:220px;">
+                <p><strong>John Smith</strong><br>Project Manager, WebWorks<br>Email: john.smith@webworks.com<br>Phone: +1 555 987 6543</p>
+            </div>
+        </div>
+    </section>
+    </div>
+    <div id="project-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#222; padding:24px; border-radius:12px; max-width:90vw; max-height:80vh; display:flex; flex-direction:column; align-items:center;">
+            <button id="close-preview-btn" style="align-self:flex-end; background:#ffd700; color:#222; border:none; border-radius:6px; padding:6px 16px; font-weight:bold; cursor:pointer; margin-bottom:12px;">Close</button>
+            <div id="project-preview-content" style="width:100%; max-width:700px; max-height:60vh; overflow:auto;"></div>
+        </div>
+    </div>
+    <script src="init.js"></script>
+    <script src="projects.js"></script>
+    <script src="experience.js"></script>
+    <script src="admin.js"></script>
+    <script>
+    // Enable editing for admin only (remove editable for social)
+    firebase.auth().onAuthStateChanged(function(user) {
+        var isAdmin = user && (user.email === 'mqtthewilustre@gmail.com');
+        document.getElementById('editable-name').setAttribute('contenteditable', isAdmin);
+        document.getElementById('editable-tagline').setAttribute('contenteditable', isAdmin);
+        document.getElementById('editable-about').setAttribute('contenteditable', isAdmin);
+        document.getElementById('editable-email').setAttribute('contenteditable', isAdmin);
+        document.getElementById('editable-phone').setAttribute('contenteditable', isAdmin);
+        document.getElementById('editable-address').setAttribute('contenteditable', isAdmin);
+        document.getElementById('editable-references').setAttribute('contenteditable', isAdmin);
+        if (isAdmin) {
+            // Auto-save logic for all editable fields except social
+            const fields = [
+                {id: 'editable-name', key: 'name'},
+                {id: 'editable-tagline', key: 'tagline'},
+                {id: 'editable-about', key: 'about'},
+                {id: 'editable-email', key: 'email'},
+                {id: 'editable-phone', key: 'phone'},
+                {id: 'editable-address', key: 'address'},
+                {id: 'editable-references', key: 'references'}
+            ];
+            fields.forEach(f => {
+                const el = document.getElementById(f.id);
+                if (el) {
+                    el.addEventListener('blur', function() {
+                        const value = el.innerHTML;
+                        firebase.firestore().collection('siteInfo').doc('main').set({ [f.key]: value }, { merge: true })
+                        .then(() => {
+                            el.style.background = '#e6ffe6';
+                            setTimeout(() => { el.style.background = 'none'; }, 600);
+                        })
+                        .catch(() => {
+                            el.style.background = '#ffe6e6';
+                            setTimeout(() => { el.style.background = 'none'; }, 600);
+                        });
+                    });
+                }
+            });
+            // Load saved values on page load
+            firebase.firestore().collection('siteInfo').doc('main').get().then(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    fields.forEach(f => {
+                        const el = document.getElementById(f.id);
+                        if (el && data[f.key]) {
+                            el.innerHTML = data[f.key];
+                        }
+                    });
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>
