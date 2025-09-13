@@ -170,27 +170,20 @@
     // Enable editing for admin only (remove editable for social)
     firebase.auth().onAuthStateChanged(function(user) {
         var isAdmin = user && (user.email === 'mqtthewilustre@gmail.com');
-        document.getElementById('editable-name').setAttribute('contenteditable', isAdmin);
-        document.getElementById('editable-tagline').setAttribute('contenteditable', isAdmin);
-        document.getElementById('editable-about').setAttribute('contenteditable', isAdmin);
-        document.getElementById('editable-email').setAttribute('contenteditable', isAdmin);
-        document.getElementById('editable-phone').setAttribute('contenteditable', isAdmin);
-        document.getElementById('editable-address').setAttribute('contenteditable', isAdmin);
-        document.getElementById('editable-references').setAttribute('contenteditable', isAdmin);
-        if (isAdmin) {
-            // Auto-save logic for all editable fields except social
-            const fields = [
-                {id: 'editable-name', key: 'name'},
-                {id: 'editable-tagline', key: 'tagline'},
-                {id: 'editable-about', key: 'about'},
-                {id: 'editable-email', key: 'email'},
-                {id: 'editable-phone', key: 'phone'},
-                {id: 'editable-address', key: 'address'},
-                {id: 'editable-references', key: 'references'}
-            ];
-            fields.forEach(f => {
-                const el = document.getElementById(f.id);
-                if (el) {
+        const fields = [
+            {id: 'editable-name', key: 'name'},
+            {id: 'editable-tagline', key: 'tagline'},
+            {id: 'editable-about', key: 'about'},
+            {id: 'editable-email', key: 'email'},
+            {id: 'editable-phone', key: 'phone'},
+            {id: 'editable-address', key: 'address'},
+            {id: 'editable-references', key: 'references'}
+        ];
+        fields.forEach(f => {
+            const el = document.getElementById(f.id);
+            if (el) {
+                el.setAttribute('contenteditable', isAdmin);
+                if (isAdmin) {
                     el.addEventListener('blur', function() {
                         const value = el.innerHTML;
                         firebase.firestore().collection('siteInfo').doc('main').set({ [f.key]: value }, { merge: true })
@@ -204,20 +197,20 @@
                         });
                     });
                 }
-            });
-            // Load saved values on page load
-            firebase.firestore().collection('siteInfo').doc('main').get().then(doc => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    fields.forEach(f => {
-                        const el = document.getElementById(f.id);
-                        if (el && data[f.key]) {
-                            el.innerHTML = data[f.key];
-                        }
-                    });
-                }
-            });
-        }
+            }
+        });
+        // Always load saved values for all users
+        firebase.firestore().collection('siteInfo').doc('main').onSnapshot(doc => {
+            if (doc.exists) {
+                const data = doc.data();
+                fields.forEach(f => {
+                    const el = document.getElementById(f.id);
+                    if (el && data[f.key]) {
+                        el.innerHTML = data[f.key];
+                    }
+                });
+            }
+        });
     });
     </script>
 </body>
